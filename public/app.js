@@ -117,7 +117,6 @@ var app = new Vue({
 	 //    	});
 		// },
 		toogleLog:function(){
-			this.getLog();
 			this.dashboardPage = false;
 			this.laporanPage = false;
 			this.logPage = true;
@@ -148,9 +147,9 @@ var app = new Vue({
 	},
 	mounted: function(){
 		this.getUser();
-
 		this.initMap();
-		this.toogleDashboard();
+		this.toogleDashboard();		
+		this.getLog();
 	}
 });
 
