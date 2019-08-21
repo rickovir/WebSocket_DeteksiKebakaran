@@ -81,14 +81,15 @@
           <div class="row">
             <div class="col-lg-4 col-md-6 col-sm-6 col-12">
               <div class="card">
-                  <div class="card-header bg-primary text-white">
+                  <div class="card-header text-white" v-bind:class="{ 'bg-primary': statusAman.aman, 'bg-danger': statusAman.aman == false}">
                     <div class="row">
                       <div class="col-3">
-                        <i class="fa fa-check fa-5x"></i>
+                        <i v-if="statusAman.aman" class="fa fa-check fa-5x"></i>
+                        <i v-if="statusAman.aman==false" class="fa fa-exclamation-triangle fa-5x"></i>
                       </div>
                       <div class="col-9 text-right">
-                        <h2>Aman</h2>
-                        <p>Tidak Ada Kebakaran</p>
+                        <h2>{{statusAman.title}}</h2>
+                        <p>{{statusAman.subtitle}}</p>
                       </div>
                     </div>
                   </div>
@@ -130,7 +131,7 @@
           <!-- End Status -->
 
           <!-- Map -->
-          <div class="hidePage row" v-bind:class="{activePage:dashboardPage}">
+          <div class="hidePage row" v-bind:class="{activePage:dashboardPage || travelPage}">
             <div class="col-12">
               <div class="card">
                 <div class="card-header">
@@ -138,6 +139,15 @@
                 </div>
                 <div class="card-body">
                   <div id="map" data-height="400"></div>
+
+                  <div class="text-center mt-4" v-if="travelPage">
+                    <a href="javascript:;" class="btn btn-primary btn-icon icon-left" id="start-travel" onclick="travel()">
+                      <i class="fas fa-play"></i>  Mulai Petunjuk Arah
+                    </a>
+                  </div>
+                  <div class="mt-4" v-if="travelPage">
+                    <ul id="instructions" class="list-unstyled list-unstyled-border"></ul>
+                  </div>
                 </div>
               </div>
             </div>
@@ -148,7 +158,7 @@
           <div class="hidePage row" v-bind:class="{activePage:laporanPage}" id="tabelLaporan">
               <div class="col-12">
                 <div class="card">
-                  <div class="card-header">
+                  <div class="card-header" v-on:click="toogleTravel()">
                     <h4>Laporan Harian</h4>
                   </div>
                   <div class="card-body">
@@ -165,7 +175,7 @@
                           </tr>
                         </thead>
                         <tbody>
-                          <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorA.api=='aman', 'bg-danger': sensorA.api=='kebakaran' }">
+                          <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorA.status=='aman', 'bg-danger': sensorA.status=='Bahaya' }">
                             <td>{{ sensorA.lokasi }}</td>
                             <td>{{ sensorA.temp }}</td>
                             <td>{{ sensorA.asap }}</td>
@@ -173,7 +183,7 @@
                             <td>{{ sensorA.status }}</td>
                             <!-- <td>Rumah A</td> -->
                           </tr>
-                          <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorB.api=='aman', 'bg-danger': sensorB.api=='kebakaran' }">
+                          <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorB.status=='aman', 'bg-danger': sensorB.status=='Bahaya' }">
                             <td>{{ sensorB.lokasi }}</td>
                             <td>{{ sensorB.temp }}</td>
                             <td>{{ sensorB.asap }}</td>
@@ -181,7 +191,7 @@
                             <td>{{ sensorB.status }}</td>
                             <!-- <td>Rumah A</td> -->
                           </tr>
-                          <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorC.api=='aman', 'bg-danger': sensorC.api=='kebakaran' }">
+                          <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorC.status=='aman', 'bg-danger': sensorC.status=='Bahaya' }">
                             <td>{{ sensorC.lokasi }}</td>
                             <td>{{ sensorC.temp }}</td>
                             <td>{{ sensorC.asap }}</td>
@@ -279,6 +289,29 @@
             </div>
             <!-- End User -->
 
+            <!-- travel -->
+
+            <div class="hidePage row">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h4>Rute Menuju Lokasi</h4>
+                  </div>
+                  <div class="card-body">
+                    <div id="map" data-height="300"></div>
+                    <div class="text-center mt-4">
+                      <a href="javascript:;" class="btn btn-primary btn-icon icon-left" id="start-travel">
+                        <i class="fas fa-play"></i>  Mulai Petunjuk Arah
+                      </a>
+                    </div>
+                    <div class="mt-4">
+                      <ul id="instructions" class="list-unstyled list-unstyled-border"></ul>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end travel -->
         </section>
       </div>
       <footer class="main-footer">
