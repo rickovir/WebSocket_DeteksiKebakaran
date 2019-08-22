@@ -5,7 +5,8 @@ var socket = io.connect('http://35.240.229.129');
     // });
 socket.on('userCount', function(data) { 
 	app.connectCounter = data.userCount;
-	console.log(data)
+	app.connectCounter--;
+	console.log(data);
 });
 socket.on("chat", function(data){
 	var suhu = parseInt(data.temp);
@@ -65,11 +66,12 @@ socket.on("log", function(data){
 	},300)
 });
 function travel(){
-	app.initMap();
+	app.initMapDirection();
+	console.log(app.mapsDirection);
 	  $("#instructions").before("<div class='section-title'>Instructions</div>");
 	  app.map.travelRoute({
-	    origin: [-6.1490404, 106.8030892],
-	    destination: [-6.1428788, 106.8030892],
+	    origin: [-6.1621916, 106.8088983],
+	    destination: [app.mapsDirection.lat, app.mapsDirection.lng],
 	    travelMode: 'driving',
 	    step: function(e) {
 	      $('#instructions').append('<li class="media"><div class="media-icon"><i class="far fa-circle"></i></div><div class="media-body">'+e.instructions+'</div></li>');
@@ -87,7 +89,8 @@ function travel(){
 }
 
 
-
+// lat -6.1621916
+// lng 106.8088983 
 
 
 
@@ -116,8 +119,10 @@ var app = new Vue({
 		sensorA:{},
 		sensorB:{},
 		sensorC:{},
+		userDirection:{},
 		logData:[],
 		userSensor :[],
+		mapsDirection : {},
 		statusAman: {
 			aman: true,
 			title: "Aman",
@@ -129,9 +134,9 @@ var app = new Vue({
 			// initialize map
 			this.map = new GMaps({
 			  div: '#map',
-			  lat: -6.1490404,
-			  lng: 106.8030892,
-			  zoom: 14
+			  lat: -6.1621916,
+			  lng: 106.8088983,
+			  zoom: 13
 			});
 			// this.userSensor = [{lat:"-6.1528788",lng:"106.8100892",title:"Rumah desi",icon:"../assets/img/sensor.png",infoWindow:{content:"<h6>Rumah desi </h6><p>Jl. Poris Gaga</p>"}},
 			// {lat:"-6.1428788",lng:"106.8030892",title:"Rumah vivi",icon:"../assets/img/sensor.png",infoWindow:{content:"<h6>Rumah vivi </h6><p>Jl. Pademangan nomor 12</p>"}},
@@ -142,6 +147,22 @@ var app = new Vue({
 				this.map.addMarker(this.userSensor[i]);
 			}
 		},
+		initMapDirection:function(){
+			// initialize map
+			this.map = new GMaps({
+			  div: '#map',
+			  lat: -6.1621916,
+			  lng: 106.8088983,
+			  zoom: 14
+			});
+			// this.userSensor = [{lat:"-6.1528788",lng:"106.8100892",title:"Rumah desi",icon:"../assets/img/sensor.png",infoWindow:{content:"<h6>Rumah desi </h6><p>Jl. Poris Gaga</p>"}},
+			// {lat:"-6.1428788",lng:"106.8030892",title:"Rumah vivi",icon:"../assets/img/sensor.png",infoWindow:{content:"<h6>Rumah vivi </h6><p>Jl. Pademangan nomor 12</p>"}},
+			// {lat:"-6.1628788",lng:"106.8070892",title:"Rumah indri",icon:"../assets/img/sensor.png",infoWindow:{content:"<h6>Rumah indri </h6><p>Jl. Kampung Gunung nomor 2</p>"}}]
+			this.map.addMarker({lat:"-6.1621916",lng:"106.8088983",title:"PEMADAM KEBAKARAN ",icon:"../assets/img/firefighter.png",infoWindow:{content:"<h6>Pemadam Kebakaran DKI Jakarta </h6><p>Jakarta Fire and Rescue Agency, Jalan Kyai Haji Zainul Arifin, RT.7/RW.10, Duri Pulo, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta</p>"}});
+					
+			this.map.addMarker(this.userDirection);
+			
+		},
 
 		timeStampTotime:function(t){
 			t = new Date(t);
@@ -151,6 +172,23 @@ var app = new Vue({
 			var dateParts = dt.split("-");
 			var jsDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2].substr(0,2));
 			return ""+jsDate.getFullYear()+"-"+(jsDate.getMonth()+1)+"-"+jsDate.getDate();
+		},
+		setDirection: function(lat,lng){
+			console.log(lat);
+			console.log(lng);
+			for(var i =0; i < this.userSensor.length;i++){
+				if(this.userSensor[i].lat == lat && this.userSensor[i].lng)
+				{
+					this.userDirection = this.userSensor[i];
+				}
+			}
+			this.mapsDirection = {
+				lat : parseFloat(lat),
+				lng : parseFloat(lng)
+			};
+
+			console.log(this.mapsDirection);
+			this.toogleTravel();
 		},
 		getUser: function(){
 			$.ajax({
@@ -173,6 +211,7 @@ var app = new Vue({
 							}
 						}) 
 					}
+					this.userSensor.push({lat:"-6.1621916",lng:"106.8088983",title:"PEMADAM KEBAKARAN ",icon:"../assets/img/firefighter.png",infoWindow:{content:"<h6>Pemadam Kebakaran DKI Jakarta </h6><p>Jakarta Fire and Rescue Agency, Jalan Kyai Haji Zainul Arifin, RT.7/RW.10, Duri Pulo, Kota Jakarta Pusat, Daerah Khusus Ibukota Jakarta</p>"}});
 					// console.log(this.userSensor);
 					this.initMap();
 	    		}
@@ -214,8 +253,10 @@ var app = new Vue({
 			this.logPage = true;
 			this.userPage = false;
 			this.tittlePage = "Halaman Log";
+			this.travelPage = false;
 		},
 		toogleLaporan:function(){
+			this.travelPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = true;
 			this.logPage = false;
@@ -223,6 +264,7 @@ var app = new Vue({
 			this.tittlePage = "Halaman Laporan";
 		},
 		toogleUser:function(){
+			this.travelPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = false;
 			this.logPage = false;
@@ -230,6 +272,8 @@ var app = new Vue({
 			this.tittlePage = "Halaman User";
 		},
 		toogleDashboard:function(){
+			this.initMap();
+			this.travelPage = false;
 			this.dashboardPage = true;
 			this.laporanPage = false;
 			this.logPage = false;

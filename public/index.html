@@ -171,6 +171,7 @@
                             <th>Asap</th>
                             <th>Api</th>
                             <th>Status</th>
+                            <th>Direksi</th>
                             <!-- <th>Lokasi</th> -->
                           </tr>
                         </thead>
@@ -181,6 +182,7 @@
                             <td>{{ sensorA.asap }}</td>
                             <td>{{ sensorA.api }}</td>
                             <td>{{ sensorA.status }}</td>
+                            <td><i class="fa fa-directions fa-3x" v-on:click="setDirection('-6.1528788', '106.8100892')"></i></td>
                             <!-- <td>Rumah A</td> -->
                           </tr>
                           <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorB.status=='aman', 'bg-danger': sensorB.status=='Bahaya' }">
@@ -189,6 +191,7 @@
                             <td>{{ sensorB.asap }}</td>
                             <td>{{ sensorB.api }}</td>
                             <td>{{ sensorB.status }}</td>
+                            <td><i class="fa fa-directions fa-3x" v-on:click="setDirection('-6.1428788', '106.8030892')"></i></td>
                             <!-- <td>Rumah A</td> -->
                           </tr>
                           <tr class="color  text-white" v-bind:class="{ 'bg-success': sensorC.status=='aman', 'bg-danger': sensorC.status=='Bahaya' }">
@@ -197,6 +200,7 @@
                             <td>{{ sensorC.asap }}</td>
                             <td>{{ sensorC.api }}</td>
                             <td>{{ sensorC.status }}</td>
+                            <td><i class="fa fa-directions fa-3x" v-on:click="setDirection('-6.1738788', '106.7910892')"></i></td>
                             <!-- <td>Rumah A</td> -->
                           </tr>
                         </tbody>
