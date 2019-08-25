@@ -30,6 +30,35 @@ io.on('connection', function(client){
 		io.sockets.emit('userCount', { userCount: userCount });
 	});
 
+	client.on('getSettings', function(data){
+		var sql = `select * from konfigurasi`;
+		con.query(sql,
+			(error, results, fields)=>{
+				if(error){
+					io.sockets.emit('log',"error : "+error);
+				}
+				
+				client.emit('getSettings',data);
+
+			});
+	});
+
+	client.on('settings', function(data){
+		io.sockets.emit('settings',data);
+		var sql = `update konfigurasi set suhu = '${data.suhu}',
+		asap = '${data.asap}'
+		where id = '1'`;
+		con.query(sql,
+			(error, results, fields)=>{
+				if(error){
+					io.sockets.emit('log',"error : "+error);
+				}
+					// console.log(sql);
+
+			});
+
+	});
+
 	client.on('chat', function(data){
 		io.sockets.emit('chat',data);
 		var d = new Date();
@@ -149,6 +178,7 @@ app.get('/api/log',(req,res)=>{
 			}
 		});
 });
+
 app.get('/api/last',(req,res)=>{
 	con.query(`SELECT distinct(id_user) FROM tb_log2 WHERE waktu BETWEEN '${req.body.awal}' and '${req.body.akhir}'`,
 		(error, results, fields)=>{
@@ -169,5 +199,46 @@ app.get('/api/last',(req,res)=>{
 					"data":results
 				});
 			}
+		});
+});
+
+app.get('/api/showsetting',(req,res)=>{
+	con.query(`SELECT * FROM konfigurasi WHERE id='1'`,
+		(error, results, fields)=>{
+			if(error){
+				// throw error;
+				res.send({
+					"code":400,
+					"failed":"error ocurred",
+					"error" : error,
+					"enter":"N"
+				});
+			}
+			else
+			{
+				res.send({
+					"code":200,
+					"status": "OK",
+					"data":results
+				});
+			}
+		});
+});
+
+app.get('/api/setting',(req, res)=>{
+	// let param = req.param;
+	con.query(`
+		update konfigurasi set suhu = '${req.param('suhu')}',
+		asap = '${req.param('asap')}'
+		where id = '1'
+		`,
+		(error, results, fields)=> {
+			if(error)
+				throw error;
+			res.send({
+					"code":200,
+					"status": "OK",
+					"data":results
+				});
 		});
 });

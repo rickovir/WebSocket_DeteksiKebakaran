@@ -107,6 +107,7 @@ var app = new Vue({
 		userPage:false,
 		logPage:false,
 		travelPage:false,
+		settingPage:false,
 		tittlePage:"",
 		dataUser:[{
 			id_user:'',
@@ -116,6 +117,8 @@ var app = new Vue({
 			password:'',
 			status:''
 		}],
+		suhu : 45,
+		asap : 700,
 		sensorA:{},
 		sensorB:{},
 		sensorC:{},
@@ -228,6 +231,30 @@ var app = new Vue({
 	    		}
 	    	});
 		},
+		getSetting: function(){
+			$.ajax({
+				url: "/api/showsetting", 
+				context:this, 
+				type: "GET",
+				success: function(result){
+					this.suhu = result.data[0].suhu;
+					this.asap = result.data[0].asap;
+	    		}
+	    	});
+		},
+		setUp: function(){
+			$.ajax({
+				url: "/api/setting/?suhu="+this.suhu+"&asap="+this.asap, 
+				context:this, 
+				type: "GET",
+				success: function(result){
+					// this.logData = result.data;
+					console.log(result);
+	    		}
+	    	});
+
+	    	socket.emit('settings', {suhu:this.suhu, asap:this.asap})
+		},
 		// getActive: function(){
 		// 	$.ajax({
 		// 		url: "/api/last", 
@@ -240,6 +267,7 @@ var app = new Vue({
 	 //    	});
 		// },
 		toogleTravel:function(){
+			this.settingPage = false;
 			this.travelPage = true;
 			this.dashboardPage = false;
 			this.laporanPage = false;
@@ -248,6 +276,7 @@ var app = new Vue({
 			this.tittlePage = "Travel";
 		},
 		toogleLog:function(){
+			this.settingPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = false;
 			this.logPage = true;
@@ -256,6 +285,7 @@ var app = new Vue({
 			this.travelPage = false;
 		},
 		toogleLaporan:function(){
+			this.settingPage = false;
 			this.travelPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = true;
@@ -264,6 +294,7 @@ var app = new Vue({
 			this.tittlePage = "Halaman Laporan";
 		},
 		toogleUser:function(){
+			this.settingPage = false;
 			this.travelPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = false;
@@ -271,8 +302,18 @@ var app = new Vue({
 			this.userPage = true;
 			this.tittlePage = "Halaman User";
 		},
+		toogleSetting:function(){
+			this.settingPage = true;
+			this.travelPage = false;
+			this.dashboardPage = false;
+			this.laporanPage = false;
+			this.logPage = false;
+			this.userPage = false;
+			this.tittlePage = "Halaman Setting";
+		},
 		toogleDashboard:function(){
 			this.initMap();
+			this.settingPage = false;
 			this.travelPage = false;
 			this.dashboardPage = true;
 			this.laporanPage = false;
@@ -282,6 +323,7 @@ var app = new Vue({
 		}
 	},
 	mounted: function(){
+		this.getSetting();
 		this.getUser();
 		this.initMap();
 		this.toogleDashboard();		
