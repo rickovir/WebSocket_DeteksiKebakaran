@@ -8,6 +8,9 @@ socket.on('userCount', function(data) {
 	app.connectCounter--;
 	console.log(data);
 });
+socket.on("settings", function(data){
+	console.log(data);
+});
 socket.on("chat", function(data){
 	var suhu = parseInt(data.temp);
 	var asap = parseInt(data.asap);
@@ -243,15 +246,15 @@ var app = new Vue({
 	    	});
 		},
 		setUp: function(){
-			$.ajax({
-				url: "/api/setting/?suhu="+this.suhu+"&asap="+this.asap, 
-				context:this, 
-				type: "GET",
-				success: function(result){
-					// this.logData = result.data;
-					console.log(result);
-	    		}
-	    	});
+			// $.ajax({
+			// 	url: "/api/setting/?suhu="+this.suhu+"&asap="+this.asap, 
+			// 	context:this, 
+			// 	type: "GET",
+			// 	success: function(result){
+			// 		// this.logData = result.data;
+			// 		console.log(result);
+	  //   		}
+	  //   	});
 
 	    	socket.emit('settings', {suhu:this.suhu, asap:this.asap})
 		},
