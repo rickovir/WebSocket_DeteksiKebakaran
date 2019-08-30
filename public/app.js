@@ -3,6 +3,14 @@ var socket = io.connect('http://35.240.229.129');
     // socket.on('chat', function(data){
     //   app.title = data.title;
     // });
+socket.on('connect',function(data){
+	initTempChart();
+	initDataTempChart();
+
+
+	initGasChart();
+	initDataGasChart();
+});
 socket.on('userCount', function(data) { 
 	app.connectCounter = data.userCount;
 	app.connectCounter--;
@@ -59,7 +67,6 @@ socket.on("chat", function(data){
 
 	}*/
 
-	initDataTempChart();
 	
 });
 socket.on("log", function(data){
@@ -68,10 +75,32 @@ socket.on("log", function(data){
 	app.logData.unshift(data);
 	setTimeout(function(){
 		$('.itemLog').removeClass('bg-primary');
-	},300)
+	},300);
+	var temp = 0;
+	var d = new Date();
+	var hour = d.getHours();
+	var min = d.getMinutes();
+	var akhir = app.gasChart.chart.data.labels.length -1;
 
-	initTempChart();
-	initDataTempChart();
+	if(min < 10)
+		min = "0"+min;
+	if(hour < 10)
+		hour = "0"+hour;
+
+	if(data.temp != null){
+		temp = data;
+	}
+
+	var time = hour+":"+min;
+	
+	if(app.gasChart.chart.data.labels[akhir] != time)
+	{
+		tempChartAddLabel(time);
+		gasChartAddLabel(time);
+	}
+	tempChartAddData(temp,data.id_user);
+	gasChartAddData(data.asap,data.id_user);
+
 });
 function travel(){
 	app.initMapDirection();
@@ -191,6 +220,103 @@ function tempChartAddData(data, who){
 
 
 
+// GAS function
+
+function initGasChart()
+{
+	app.gasChart.ctx = document.getElementById("gasChart").getContext('2d');
+	app.gasChart.chart = new Chart(app.gasChart.ctx, {
+	  type: 'line',
+	  data: {
+	    labels: [],
+	    datasets: []
+	  },
+	  options: {
+	    legend: {
+	      display: true
+	    },
+	    scales: {
+	      yAxes: [{
+	        gridLines: {
+	          drawBorder: false,
+	          color: '#f2f2f2',
+	        },
+	        ticks: {
+	          beginAtZero: true,
+	          stepSize: 150
+	        }
+	      }],
+	      xAxes: [{
+	        ticks: {
+	          display: true
+	        },
+	        gridLines: {
+	          display: true
+	        }
+	      }]
+	    },
+	  }
+	});
+}
+function initDataGasChart(){
+	var dataSet1 = 
+	{
+		label: 'USR01',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#6777ef',
+		borderColor: '#6777ef',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+
+	var dataSet2 = 
+	{
+		label: 'USR02',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+
+	var dataSet3 = 
+	{
+		label: 'USR03',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+	gasChartAddSensor(dataSet1);
+	gasChartAddSensor(dataSet2);
+	gasChartAddSensor(dataSet3);
+}
+function gasChartAddSensor(dataset){
+	app.gasChart.chart.data.datasets.push(dataset);
+	app.gasChart.chart.update();
+}
+function gasChartAddLabel(label){
+	app.gasChart.chart.data.labels.push(label);
+}
+function gasChartAddData(data, who){
+	app.gasChart.chart.data.datasets.forEach(dataset => {
+		if(dataset.label == who)
+		{
+			dataset.data.push(data);
+		}
+	});
+	app.gasChart.chart.update();
+}
+
+
+
 var app = new Vue({
 	el:'#app',
 	data:{
@@ -221,6 +347,12 @@ var app = new Vue({
 		userSensor :[],
 		mapsDirection : {},
 		tempChart : {
+			ctx :null,
+			chart :null,
+			labels : [],
+			dataSet : []
+		},
+		gasChart : {
 			ctx :null,
 			chart :null,
 			labels : [],
@@ -415,9 +547,9 @@ var app = new Vue({
 			this.initMap();
 			this.settingPage = false;
 			this.travelPage = false;
-			this.dashboardPage = false;
+			this.dashboardPage = true;
 			this.laporanPage = false;
-			this.logPage = true;
+			this.logPage = false;
 			this.userPage = false;
 			this.tittlePage = "Dashboard";
 		}
