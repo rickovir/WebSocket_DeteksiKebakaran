@@ -3,9 +3,20 @@ var socket = io.connect('http://35.240.229.129');
     // socket.on('chat', function(data){
     //   app.title = data.title;
     // });
+socket.on('connect',function(data){
+	initTempChart();
+	initDataTempChart();
+
+
+	initGasChart();
+	initDataGasChart();
+});
 socket.on('userCount', function(data) { 
 	app.connectCounter = data.userCount;
 	app.connectCounter--;
+	console.log(data);
+});
+socket.on("settings", function(data){
 	console.log(data);
 });
 socket.on("chat", function(data){
@@ -55,6 +66,7 @@ socket.on("chat", function(data){
 	{
 
 	}*/
+
 	
 });
 socket.on("log", function(data){
@@ -63,7 +75,32 @@ socket.on("log", function(data){
 	app.logData.unshift(data);
 	setTimeout(function(){
 		$('.itemLog').removeClass('bg-primary');
-	},300)
+	},300);
+	var temp = 0;
+	var d = new Date();
+	var hour = d.getHours();
+	var min = d.getMinutes();
+	var akhir = app.gasChart.chart.data.labels.length -1;
+
+	if(min < 10)
+		min = "0"+min;
+	if(hour < 10)
+		hour = "0"+hour;
+
+	if(data.temp != null){
+		temp = data;
+	}
+
+	var time = hour+":"+min;
+	
+	if(app.gasChart.chart.data.labels[akhir] != time)
+	{
+		tempChartAddLabel(time);
+		gasChartAddLabel(time);
+	}
+	tempChartAddData(temp,data.id_user);
+	gasChartAddData(data.asap,data.id_user);
+
 });
 function travel(){
 	app.initMapDirection();
@@ -88,12 +125,195 @@ function travel(){
 	  });
 }
 
+function initTempChart()
+{
+	app.tempChart.ctx = document.getElementById("tempChart").getContext('2d');
+	app.tempChart.chart = new Chart(app.tempChart.ctx, {
+	  type: 'line',
+	  data: {
+	    labels: [],
+	    datasets: []
+	  },
+	  options: {
+	    legend: {
+	      display: true
+	    },
+	    scales: {
+	      yAxes: [{
+	        gridLines: {
+	          drawBorder: false,
+	          color: '#f2f2f2',
+	        },
+	        ticks: {
+	          beginAtZero: true,
+	          stepSize: 150
+	        }
+	      }],
+	      xAxes: [{
+	        ticks: {
+	          display: true
+	        },
+	        gridLines: {
+	          display: true
+	        }
+	      }]
+	    },
+	  }
+	});
+}
+function initDataTempChart(){
+	var dataSet1 = 
+	{
+		label: 'USR01',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#6777ef',
+		borderColor: '#6777ef',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
 
-// lat -6.1621916
-// lng 106.8088983 
+	var dataSet2 = 
+	{
+		label: 'USR02',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+
+	var dataSet3 = 
+	{
+		label: 'USR03',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+	tempChartAddSensor(dataSet1);
+	tempChartAddSensor(dataSet2);
+	tempChartAddSensor(dataSet3);
+}
+function tempChartAddSensor(dataset){
+	app.tempChart.chart.data.datasets.push(dataset);
+	app.tempChart.chart.update();
+}
+function tempChartAddLabel(label){
+	app.tempChart.chart.data.labels.push(label);
+}
+function tempChartAddData(data, who){
+	app.tempChart.chart.data.datasets.filter(dataset => {
+		if(dataset.label == who)
+		{
+			dataset.data.push(data);
+		}
+	});
+	app.tempChart.chart.update();
+}
 
 
 
+// GAS function
+
+function initGasChart()
+{
+	app.gasChart.ctx = document.getElementById("gasChart").getContext('2d');
+	app.gasChart.chart = new Chart(app.gasChart.ctx, {
+	  type: 'line',
+	  data: {
+	    labels: [],
+	    datasets: []
+	  },
+	  options: {
+	    legend: {
+	      display: true
+	    },
+	    scales: {
+	      yAxes: [{
+	        gridLines: {
+	          drawBorder: false,
+	          color: '#f2f2f2',
+	        },
+	        ticks: {
+	          beginAtZero: true,
+	          stepSize: 150
+	        }
+	      }],
+	      xAxes: [{
+	        ticks: {
+	          display: true
+	        },
+	        gridLines: {
+	          display: true
+	        }
+	      }]
+	    },
+	  }
+	});
+}
+function initDataGasChart(){
+	var dataSet1 = 
+	{
+		label: 'USR01',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#6777ef',
+		borderColor: '#6777ef',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+
+	var dataSet2 = 
+	{
+		label: 'USR02',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+
+	var dataSet3 = 
+	{
+		label: 'USR03',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+	gasChartAddSensor(dataSet1);
+	gasChartAddSensor(dataSet2);
+	gasChartAddSensor(dataSet3);
+}
+function gasChartAddSensor(dataset){
+	app.gasChart.chart.data.datasets.push(dataset);
+	app.gasChart.chart.update();
+}
+function gasChartAddLabel(label){
+	app.gasChart.chart.data.labels.push(label);
+}
+function gasChartAddData(data, who){
+	app.gasChart.chart.data.datasets.forEach(dataset => {
+		if(dataset.label == who)
+		{
+			dataset.data.push(data);
+		}
+	});
+	app.gasChart.chart.update();
+}
 
 
 
@@ -107,6 +327,7 @@ var app = new Vue({
 		userPage:false,
 		logPage:false,
 		travelPage:false,
+		settingPage:false,
 		tittlePage:"",
 		dataUser:[{
 			id_user:'',
@@ -116,6 +337,8 @@ var app = new Vue({
 			password:'',
 			status:''
 		}],
+		suhu : 45,
+		asap : 700,
 		sensorA:{},
 		sensorB:{},
 		sensorC:{},
@@ -123,6 +346,18 @@ var app = new Vue({
 		logData:[],
 		userSensor :[],
 		mapsDirection : {},
+		tempChart : {
+			ctx :null,
+			chart :null,
+			labels : [],
+			dataSet : []
+		},
+		gasChart : {
+			ctx :null,
+			chart :null,
+			labels : [],
+			dataSet : []
+		},
 		statusAman: {
 			aman: true,
 			title: "Aman",
@@ -228,6 +463,30 @@ var app = new Vue({
 	    		}
 	    	});
 		},
+		getSetting: function(){
+			$.ajax({
+				url: "/api/showsetting", 
+				context:this, 
+				type: "GET",
+				success: function(result){
+					this.suhu = result.data[0].suhu;
+					this.asap = result.data[0].asap;
+	    		}
+	    	});
+		},
+		setUp: function(){
+			// $.ajax({
+			// 	url: "/api/setting/?suhu="+this.suhu+"&asap="+this.asap, 
+			// 	context:this, 
+			// 	type: "GET",
+			// 	success: function(result){
+			// 		// this.logData = result.data;
+			// 		console.log(result);
+	  //   		}
+	  //   	});
+
+	    	socket.emit('settings', {suhu:this.suhu, asap:this.asap})
+		},
 		// getActive: function(){
 		// 	$.ajax({
 		// 		url: "/api/last", 
@@ -240,6 +499,7 @@ var app = new Vue({
 	 //    	});
 		// },
 		toogleTravel:function(){
+			this.settingPage = false;
 			this.travelPage = true;
 			this.dashboardPage = false;
 			this.laporanPage = false;
@@ -248,6 +508,7 @@ var app = new Vue({
 			this.tittlePage = "Travel";
 		},
 		toogleLog:function(){
+			this.settingPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = false;
 			this.logPage = true;
@@ -256,6 +517,7 @@ var app = new Vue({
 			this.travelPage = false;
 		},
 		toogleLaporan:function(){
+			this.settingPage = false;
 			this.travelPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = true;
@@ -264,6 +526,7 @@ var app = new Vue({
 			this.tittlePage = "Halaman Laporan";
 		},
 		toogleUser:function(){
+			this.settingPage = false;
 			this.travelPage = false;
 			this.dashboardPage = false;
 			this.laporanPage = false;
@@ -271,8 +534,18 @@ var app = new Vue({
 			this.userPage = true;
 			this.tittlePage = "Halaman User";
 		},
+		toogleSetting:function(){
+			this.settingPage = true;
+			this.travelPage = false;
+			this.dashboardPage = false;
+			this.laporanPage = false;
+			this.logPage = false;
+			this.userPage = false;
+			this.tittlePage = "Halaman Setting";
+		},
 		toogleDashboard:function(){
 			this.initMap();
+			this.settingPage = false;
 			this.travelPage = false;
 			this.dashboardPage = true;
 			this.laporanPage = false;
@@ -282,6 +555,7 @@ var app = new Vue({
 		}
 	},
 	mounted: function(){
+		this.getSetting();
 		this.getUser();
 		this.initMap();
 		this.toogleDashboard();		

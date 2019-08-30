@@ -65,6 +65,9 @@
               <li class="nav-item" v-bind:class="{active:logPage}">
                 <a class="nav-link" href="#" v-on:click="toogleLog()"><i class="fas fa-clipboard-list"></i> <span>Log Pendeteksian</span></a>
               </li>
+              <li class="nav-item" v-bind:class="{active:settingPage}">
+                <a class="nav-link" href="#" v-on:click="toogleSetting()"><i class="fas fa-cog"></i> <span>Setting</span></a>
+              </li>
           </ul>
         </aside>
       </div>
@@ -218,7 +221,29 @@
               <div class="col-12">
                 <div class="card">
                   <div class="card-header">
-                    <h4>Laporan Harian</h4>
+                    <h4>Aktifitas Suhu</h4>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="tempChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h4>Aktifitas Asap</h4>
+                  </div>
+                  <div class="card-body">
+                    <canvas id="gasChart"></canvas>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h4>Log Pendeteksian</h4>
                   </div>
                   <div class="card-body">
                     <div class="table-responsive">
@@ -292,6 +317,40 @@
               </div>
             </div>
             <!-- End User -->
+          
+
+          <!-- Setting -->
+          <div class="hidePage row" v-bind:class="{activePage:settingPage}">
+              <div class="col-12">
+                <div class="card">
+                  <div class="card-header">
+                    <h4>Setting Deteksi Batas Kebakaran</h4>
+                  </div>
+                  <div class="card-body">
+                    <div class="alert alert-success alert-dismissible show fade" id="alertSuccess">
+                      <div class="alert-body">
+                        <button class="close" data-dismiss="alert">
+                          <span>×</span>
+                        </button>
+                        Batas Deteksi Berhasil diubah
+                      </div>
+                    </div>
+                    <div class="form-group">
+                      <label>Suhu</label>
+                      <input type="text" class="form-control" v-model="suhu">
+                    </div>
+                    <div class="form-group">
+                      <label>Asap</label>
+                      <input type="text" class="form-control" v-model="asap">
+                    </div>
+                    <button class="btn btn-primary" v-on:click="setUp">Atur Deteksi</button>
+                  </div>
+
+
+                </div>
+              </div>
+            </div>
+            <!-- End Setting -->
 
             <!-- travel -->
 
