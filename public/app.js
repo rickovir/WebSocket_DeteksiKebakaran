@@ -58,6 +58,8 @@ socket.on("chat", function(data){
 	{
 
 	}*/
+
+	initDataTempChart();
 	
 });
 socket.on("log", function(data){
@@ -67,6 +69,9 @@ socket.on("log", function(data){
 	setTimeout(function(){
 		$('.itemLog').removeClass('bg-primary');
 	},300)
+
+	initTempChart();
+	initDataTempChart();
 });
 function travel(){
 	app.initMapDirection();
@@ -91,12 +96,98 @@ function travel(){
 	  });
 }
 
+function initTempChart()
+{
+	app.tempChart.ctx = document.getElementById("tempChart").getContext('2d');
+	app.tempChart.chart = new Chart(app.tempChart.ctx, {
+	  type: 'line',
+	  data: {
+	    labels: [],
+	    datasets: []
+	  },
+	  options: {
+	    legend: {
+	      display: true
+	    },
+	    scales: {
+	      yAxes: [{
+	        gridLines: {
+	          drawBorder: false,
+	          color: '#f2f2f2',
+	        },
+	        ticks: {
+	          beginAtZero: true,
+	          stepSize: 150
+	        }
+	      }],
+	      xAxes: [{
+	        ticks: {
+	          display: true
+	        },
+	        gridLines: {
+	          display: true
+	        }
+	      }]
+	    },
+	  }
+	});
+}
+function initDataTempChart(){
+	var dataSet1 = 
+	{
+		label: 'USR01',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#6777ef',
+		borderColor: '#6777ef',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
 
-// lat -6.1621916
-// lng 106.8088983 
+	var dataSet2 = 
+	{
+		label: 'USR02',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
 
-
-
+	var dataSet3 = 
+	{
+		label: 'USR03',
+		data: [],
+		borderWidth: 2,
+		// backgroundColor: '#34395e',
+		borderColor: '#34395e',
+		borderWidth: 2.5,
+		pointBackgroundColor: '#ffffff',
+		pointRadius: 4
+	};	
+	tempChartAddSensor(dataSet1);
+	tempChartAddSensor(dataSet2);
+	tempChartAddSensor(dataSet3);
+}
+function tempChartAddSensor(dataset){
+	app.tempChart.chart.data.datasets.push(dataset);
+	app.tempChart.chart.update();
+}
+function tempChartAddLabel(label){
+	app.tempChart.chart.data.labels.push(label);
+}
+function tempChartAddData(data, who){
+	app.tempChart.chart.data.datasets.filter(dataset => {
+		if(dataset.label == who)
+		{
+			dataset.data.push(data);
+		}
+	});
+	app.tempChart.chart.update();
+}
 
 
 
@@ -129,6 +220,12 @@ var app = new Vue({
 		logData:[],
 		userSensor :[],
 		mapsDirection : {},
+		tempChart : {
+			ctx :null,
+			chart :null,
+			labels : [],
+			dataSet : []
+		},
 		statusAman: {
 			aman: true,
 			title: "Aman",
@@ -318,9 +415,9 @@ var app = new Vue({
 			this.initMap();
 			this.settingPage = false;
 			this.travelPage = false;
-			this.dashboardPage = true;
+			this.dashboardPage = false;
 			this.laporanPage = false;
-			this.logPage = false;
+			this.logPage = true;
 			this.userPage = false;
 			this.tittlePage = "Dashboard";
 		}
